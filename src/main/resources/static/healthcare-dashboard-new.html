@@ -161,6 +161,67 @@
         .bmi-underweight { background: #cce7ff; color: #004085; }
         .bmi-obese { background: #f8d7da; color: #721c24; }
 
+        .risk-score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .risk-category {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        .predicted-conditions {
+            margin: 20px 0;
+        }
+
+        .condition-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .condition-item {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #dc3545;
+            font-size: 0.95em;
+        }
+
+        .recommendations {
+            margin: 20px 0;
+        }
+
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .recommendation-item {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+            font-size: 0.95em;
+        }
+
         .actions-section {
             background: #f8f9fa;
             border-radius: 12px;
@@ -203,30 +264,30 @@
                 margin: 10px;
                 border-radius: 10px;
             }
-            
+
             .header {
                 padding: 20px 15px;
             }
-            
+
             .back-btn {
                 position: static;
                 transform: none;
                 margin-bottom: 15px;
                 display: inline-block;
             }
-            
+
             .header h1 {
                 font-size: 1.8em;
             }
-            
+
             .dashboard-content {
                 padding: 25px 15px;
             }
-            
+
             .cards-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .data-row {
                 flex-direction: column;
                 align-items: flex-start;
@@ -253,306 +314,332 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #dc3545;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="/api/home" class="back-btn">← Back to Form</a>
-            <h1>Healthcare Dashboard</h1>
-            <p>Your personal health risk assessment results</p>
-        </div>
-        
-        <div class="dashboard-content">
-            <div id="loadingSection" class="loading">
-                <div class="spinner"></div>
-                <p>Loading your assessment data...</p>
-            </div>
-
-            <div id="dashboardData" style="display: none;">
-                <div class="status-banner">
-                    <h2>✅ Assessment Complete</h2>
-                    <p>Your health data has been successfully processed and analyzed</p>
-                </div>
-
-                <div class="cards-grid">
-                    <div class="info-card">
-                        <div class="card-title">
-                            <span class="card-icon">👤</span>
-                            Personal Information
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Name:</span>
-                            <span class="data-value" id="displayName">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Age:</span>
-                            <span class="data-value" id="displayAge">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Gender:</span>
-                            <span class="data-value" id="displayGender">-</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="card-title">
-                            <span class="card-icon">📏</span>
-                            Physical Measurements
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Height:</span>
-                            <span class="data-value" id="displayHeight">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Weight:</span>
-                            <span class="data-value" id="displayWeight">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">BMI:</span>
-                            <span class="data-value" id="displayBMI">-</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="card-title">
-                            <span class="card-icon">❤️</span>
-                            Vital Signs
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Blood Pressure:</span>
-                            <span class="data-value" id="displayBP">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Heart Rate:</span>
-                            <span class="data-value" id="displayHeartRate">-</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="card-title">
-                            <span class="card-icon">🏃</span>
-                            Lifestyle Factors
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Smoking Status:</span>
-                            <span class="data-value" id="displaySmoking">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Alcohol Consumption:</span>
-                            <span class="data-value" id="displayAlcohol">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Weekly Steps:</span>
-                            <span class="data-value" id="displaySteps">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Weekly Sleep Hours:</span>
-                            <span class="data-value" id="displaySleep">-</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="card-title">
-                            <span class="card-icon">🏥</span>
-                            Medical History
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Major Illness:</span>
-                            <span class="data-value" id="displayIllness">-</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Current Medications:</span>
-                            <span class="data-value" id="displayMedications">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="risk-assessment">
-                    <h3 style="margin-bottom: 15px; color: #856404;">📊 Health Risk Assessment</h3>
-                    <div id="riskAnalysis">
-                        <p>Based on your submitted data, here's a preliminary health assessment:</p>
-                        <ul id="riskFactors" style="margin: 15px 0; padding-left: 20px;">
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="actions-section">
-                    <h3 style="margin-bottom: 20px; color: #333;">Next Steps</h3>
-                    <a href="/api/home" class="action-btn">Take New Assessment</a>
-                    <button class="action-btn" onclick="generateReport()">Download Report</button>
-                    <button class="action-btn" onclick="shareResults()">Share Results</button>
-                </div>
-            </div>
-
-            <div id="noDataSection" class="no-data" style="display: none;">
-                <h2>No Assessment Data Found</h2>
-                <p>Please complete the health assessment form first.</p>
-                <a href="/api/home" class="action-btn" style="margin-top: 20px;">Start Assessment</a>
-            </div>
-        </div>
+<div class="container">
+    <div class="header">
+        <a href="/api/home" class="back-btn">← Back to Form</a>
+        <h1>Healthcare Dashboard</h1>
+        <p>Your personal health risk assessment results</p>
     </div>
 
-    <script>
-        // Load and display assessment data
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                const assessmentData = sessionStorage.getItem('healthAssessmentData');
-                
-                document.getElementById('loadingSection').style.display = 'none';
-                
-                if (assessmentData) {
-                    const data = JSON.parse(assessmentData);
-                    displayAssessmentData(data);
-                    document.getElementById('dashboardData').style.display = 'block';
-                } else {
-                    document.getElementById('noDataSection').style.display = 'block';
-                }
-            }, 1500); // Simulate loading time
+    <div class="dashboard-content">
+        <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your assessment data...</p>
+        </div>
+
+        <div id="dashboardData" style="display: none;">
+            <div class="status-banner">
+                <h2>Assessment Complete</h2>
+                <p>Your health data has been successfully processed and analyzed</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="info-card">
+                    <div class="card-title">
+                        <span class="card-icon">👤</span>
+                        Personal Information
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Name:</span>
+                        <span class="data-value" id="displayName">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Age:</span>
+                        <span class="data-value" id="displayAge">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gender:</span>
+                        <span class="data-value" id="displayGender">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-title">
+                        <span class="card-icon">📏</span>
+                        Physical Measurements
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Height:</span>
+                        <span class="data-value" id="displayHeight">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Weight:</span>
+                        <span class="data-value" id="displayWeight">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">BMI:</span>
+                        <span class="data-value" id="displayBMI">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-title">
+                        <span class="card-icon">❤️</span>
+                        Vital Signs
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Blood Pressure:</span>
+                        <span class="data-value" id="displayBP">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Heart Rate:</span>
+                        <span class="data-value" id="displayHeartRate">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-title">
+                        <span class="card-icon">🏃</span>
+                        Lifestyle Factors
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Smoking Status:</span>
+                        <span class="data-value" id="displaySmoking">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Alcohol Consumption:</span>
+                        <span class="data-value" id="displayAlcohol">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Weekly Steps:</span>
+                        <span class="data-value" id="displaySteps">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Weekly Sleep Hours:</span>
+                        <span class="data-value" id="displaySleep">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-title">
+                        <span class="card-icon">🏥</span>
+                        Medical History
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Major Illness:</span>
+                        <span class="data-value" id="displayIllness">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Current Medications:</span>
+                        <span class="data-value" id="displayMedications">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="risk-assessment">
+                <h3 style="margin-bottom: 20px; color: #856404; text-align: center;">📊 AI Risk Assessment Results</h3>
+                <div id="riskAnalysis">
+                    <div class="risk-score" id="riskScore">Loading...</div>
+                    <div style="text-align: center;">
+                        <span class="risk-category" id="riskCategory">Analyzing...</span>
+                    </div>
+
+                    <div class="predicted-conditions" id="predictedConditionsSection" style="display: none;">
+                        <h4 style="margin-bottom: 15px; color: #333;">⚠️ Predicted Risk Conditions:</h4>
+                        <ul class="condition-list" id="conditionsList"></ul>
+                    </div>
+
+                    <div class="recommendations" id="recommendationsSection" style="display: none;">
+                        <h4 style="margin-bottom: 15px; color: #333;">💡 Lifestyle Recommendations:</h4>
+                        <ul class="recommendation-list" id="recommendationsList"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-section">
+                <h3 style="margin-bottom: 20px; color: #333;">Next Steps</h3>
+                <a href="/api/home" class="action-btn">Take New Assessment</a>
+                <button class="action-btn" onclick="generateReport()">Download Report</button>
+                <button class="action-btn" onclick="shareResults()">Share Results</button>
+            </div>
+        </div>
+
+        <div id="noDataSection" class="no-data" style="display: none;">
+            <h2>No Assessment Data Found</h2>
+            <p>Please complete the health assessment form first.</p>
+            <a href="/api/home" class="action-btn" style="margin-top: 20px;">Start Assessment</a>
+        </div>
+
+        <div id="errorSection" class="error-message" style="display: none;">
+            <h3>Error Loading Risk Assessment</h3>
+            <p id="errorMessage">Unable to generate risk assessment. Please try again.</p>
+            <a href="/api/home" class="action-btn" style="margin-top: 20px;">Back to Form</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load and display assessment data
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            const assessmentData = sessionStorage.getItem('healthAssessmentData');
+
+            document.getElementById('loadingSection').style.display = 'none';
+
+            if (assessmentData) {
+                const data = JSON.parse(assessmentData);
+                displayAssessmentData(data);
+                fetchRiskAssessment(data);
+                document.getElementById('dashboardData').style.display = 'block';
+            } else {
+                document.getElementById('noDataSection').style.display = 'block';
+            }
+        }, 1500);
+    });
+
+    function displayAssessmentData(data) {
+        // Personal Information
+        document.getElementById('displayName').textContent = data.name || 'Not provided';
+        document.getElementById('displayAge').textContent = data.age ? `${data.age} years` : 'Not provided';
+        document.getElementById('displayGender').textContent = data.gender || 'Not provided';
+
+        // Physical Measurements
+        document.getElementById('displayHeight').textContent = data.height ? `${data.height} cm` : 'Not provided';
+        document.getElementById('displayWeight').textContent = data.weight ? `${data.weight} kg` : 'Not provided';
+
+        // Calculate and display BMI
+        if (data.height && data.weight) {
+            const heightInMeters = data.height / 100;
+            const bmi = (data.weight / (heightInMeters * heightInMeters)).toFixed(1);
+            const bmiCategory = getBMICategory(bmi);
+            document.getElementById('displayBMI').innerHTML = `${bmi} <span class="bmi-indicator ${bmiCategory.class}">${bmiCategory.label}</span>`;
+        }
+
+        // Vital Signs
+        document.getElementById('displayBP').textContent = `${data.systolicBP}/${data.diastolicBP} mmHg`;
+        document.getElementById('displayHeartRate').textContent = `${data.heartRate} BPM`;
+
+        // Lifestyle Factors
+        document.getElementById('displaySmoking').textContent = capitalizeFirst(data.smokingStatus) || 'Not provided';
+        document.getElementById('displayAlcohol').textContent = capitalizeFirst(data.alcoholConsumption) || 'Not provided';
+        document.getElementById('displaySteps').textContent = data.weeklySteps ? data.weeklySteps.toLocaleString() : 'Not provided';
+        document.getElementById('displaySleep').textContent = data.weeklySleepHours ? `${data.weeklySleepHours} hours` : 'Not provided';
+
+        // Medical History
+        document.getElementById('displayIllness').textContent = data.majorIllness || 'None';
+        document.getElementById('displayMedications').textContent = data.currentMedications || 'None';
+    }
+
+    function fetchRiskAssessment(formData) {
+        fetch('/api/generate-insights', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayRiskAssessment(data);
+        })
+        .catch(error => {
+            console.error('Error fetching risk assessment:', error);
+            showError('Failed to load risk assessment from server. Please try again.');
         });
+    }
 
-        function displayAssessmentData(data) {
-            // Personal Information
-            document.getElementById('displayName').textContent = data.name || 'Not provided';
-            document.getElementById('displayAge').textContent = data.age ? `${data.age} years` : 'Not provided';
-            document.getElementById('displayGender').textContent = data.gender || 'Not provided';
+    function displayRiskAssessment(riskData) {
+        // Display risk score
+        document.getElementById('riskScore').textContent = riskData.risk_score || 'N/A';
 
-            // Physical Measurements
-            document.getElementById('displayHeight').textContent = data.height ? `${data.height} cm` : 'Not provided';
-            document.getElementById('displayWeight').textContent = data.weight ? `${data.weight} kg` : 'Not provided';
-            
-            // Calculate and display BMI
-            if (data.height && data.weight) {
-                const heightInMeters = data.height / 100;
-                const bmi = (data.weight / (heightInMeters * heightInMeters)).toFixed(1);
-                const bmiCategory = getBMICategory(bmi);
-                document.getElementById('displayBMI').innerHTML = `${bmi} <span class="bmi-indicator ${bmiCategory.class}">${bmiCategory.label}</span>`;
-            }
+        // Display risk category with appropriate styling
+        const riskCategoryElement = document.getElementById('riskCategory');
+        const category = riskData.risk_category || 'Unknown';
+        riskCategoryElement.textContent = category;
 
-            // Vital Signs
-            document.getElementById('displayBP').textContent = `${data.systolicBP}/${data.diastolicBP} mmHg`;
-            document.getElementById('displayHeartRate').textContent = `${data.heartRate} BPM`;
-
-            // Lifestyle Factors
-            document.getElementById('displaySmoking').textContent = capitalizeFirst(data.smokingStatus) || 'Not provided';
-            document.getElementById('displayAlcohol').textContent = capitalizeFirst(data.alcoholConsumption) || 'Not provided';
-            document.getElementById('displaySteps').textContent = data.weeklySteps ? data.weeklySteps.toLocaleString() : 'Not provided';
-            document.getElementById('displaySleep').textContent = data.weeklySleepHours ? `${data.weeklySleepHours} hours` : 'Not provided';
-
-            // Medical History
-            document.getElementById('displayIllness').textContent = data.majorIllness || 'None';
-            document.getElementById('displayMedications').textContent = data.currentMedications || 'None';
-
-            // Generate risk analysis
-            generateRiskAnalysis(data);
+        // Apply styling based on risk category
+        riskCategoryElement.className = 'risk-category';
+        if (category.toLowerCase().includes('low')) {
+            riskCategoryElement.classList.add('risk-low');
+        } else if (category.toLowerCase().includes('medium') || category.toLowerCase().includes('moderate')) {
+            riskCategoryElement.classList.add('risk-medium');
+        } else if (category.toLowerCase().includes('high')) {
+            riskCategoryElement.classList.add('risk-high');
         }
 
-        function getBMICategory(bmi) {
-            if (bmi < 18.5) return { class: 'bmi-underweight', label: 'Underweight' };
-            if (bmi < 25) return { class: 'bmi-normal', label: 'Normal' };
-            if (bmi < 30) return { class: 'bmi-overweight', label: 'Overweight' };
-            return { class: 'bmi-obese', label: 'Obese' };
-        }
+        // Display predicted conditions
+        if (riskData.predicted_conditions && riskData.predicted_conditions.length > 0) {
+            document.getElementById('predictedConditionsSection').style.display = 'block';
+            const conditionsList = document.getElementById('conditionsList');
+            conditionsList.innerHTML = '';
 
-        function capitalizeFirst(str) {
-            if (!str) return '';
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function generateRiskAnalysis(data) {
-            const riskFactors = [];
-            
-            // BMI Analysis
-            if (data.height && data.weight) {
-                const heightInMeters = data.height / 100;
-                const bmi = data.weight / (heightInMeters * heightInMeters);
-                if (bmi >= 30) {
-                    riskFactors.push("⚠️ BMI indicates obesity - consider consulting a healthcare provider");
-                } else if (bmi >= 25) {
-                    riskFactors.push("⚡ BMI indicates overweight - healthy lifestyle changes recommended");
-                } else if (bmi < 18.5) {
-                    riskFactors.push("⚡ BMI indicates underweight - nutritional assessment may be helpful");
-                } else {
-                    riskFactors.push("✅ BMI is within normal range");
-                }
-            }
-
-            // Blood Pressure Analysis
-            if (data.systolicBP >= 140 || data.diastolicBP >= 90) {
-                riskFactors.push("⚠️ Blood pressure readings suggest hypertension - medical consultation recommended");
-            } else if (data.systolicBP >= 120 || data.diastolicBP >= 80) {
-                riskFactors.push("⚡ Blood pressure readings are elevated - monitor regularly");
-            } else {
-                riskFactors.push("✅ Blood pressure is within normal range");
-            }
-
-            // Heart Rate Analysis
-            if (data.heartRate > 100) {
-                riskFactors.push("⚡ Resting heart rate is elevated - consider cardio fitness improvement");
-            } else if (data.heartRate < 60) {
-                riskFactors.push("ℹ️ Low resting heart rate - may indicate good fitness or should be evaluated");
-            } else {
-                riskFactors.push("✅ Resting heart rate is within normal range");
-            }
-
-            // Lifestyle Analysis
-            if (data.smokingStatus === 'regular') {
-                riskFactors.push("⚠️ Regular smoking significantly increases health risks");
-            } else if (data.smokingStatus === 'sometime') {
-                riskFactors.push("⚡ Occasional smoking still poses health risks");
-            }
-
-            if (data.alcoholConsumption === 'regular') {
-                riskFactors.push("⚡ Regular alcohol consumption - consider moderation");
-            }
-
-            // Activity Analysis
-            if (data.weeklySteps < 35000) { // Less than 5000 steps per day
-                riskFactors.push("⚡ Low weekly step count - increased physical activity recommended");
-            } else {
-                riskFactors.push("✅ Good activity level based on weekly steps");
-            }
-
-            // Sleep Analysis
-            const dailySleep = data.weeklySleepHours / 7;
-            if (dailySleep < 6) {
-                riskFactors.push("⚠️ Insufficient sleep may impact health - aim for 7-9 hours nightly");
-            } else if (dailySleep > 9) {
-                riskFactors.push("ℹ️ High sleep duration - ensure quality and rule out underlying issues");
-            } else {
-                riskFactors.push("✅ Sleep duration appears adequate");
-            }
-
-            // Display risk factors
-            const riskList = document.getElementById('riskFactors');
-            riskList.innerHTML = '';
-            riskFactors.forEach(factor => {
+            riskData.predicted_conditions.forEach(condition => {
                 const li = document.createElement('li');
-                li.innerHTML = factor;
-                li.style.marginBottom = '8px';
-                riskList.appendChild(li);
+                li.className = 'condition-item';
+                li.textContent = condition;
+                conditionsList.appendChild(li);
             });
         }
 
-        function generateReport() {
-            alert('Report generation feature would be implemented here. This would create a PDF summary of the assessment.');
-        }
+        // Display lifestyle recommendations
+        if (riskData.lifestyle_recommendations && riskData.lifestyle_recommendations.length > 0) {
+            document.getElementById('recommendationsSection').style.display = 'block';
+            const recommendationsList = document.getElementById('recommendationsList');
+            recommendationsList.innerHTML = '';
 
-        function shareResults() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Healthcare Risk Assessment Results',
-                    text: 'I completed my healthcare risk assessment.',
-                    url: window.location.href
-                });
-            } else {
-                // Fallback for browsers that don't support Web Share API
-                const url = window.location.href;
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('Dashboard URL copied to clipboard!');
-                });
-            }
+            riskData.lifestyle_recommendations.forEach(recommendation => {
+                const li = document.createElement('li');
+                li.className = 'recommendation-item';
+                li.textContent = recommendation;
+                recommendationsList.appendChild(li);
+            });
         }
-    </script>
+    }
+
+    function showError(message) {
+        document.getElementById('dashboardData').style.display = 'none';
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorSection').style.display = 'block';
+    }
+
+    function getBMICategory(bmi) {
+        if (bmi < 18.5) return { class: 'bmi-underweight', label: 'Underweight' };
+        if (bmi < 25) return { class: 'bmi-normal', label: 'Normal' };
+        if (bmi < 30) return { class: 'bmi-overweight', label: 'Overweight' };
+        return { class: 'bmi-obese', label: 'Obese' };
+    }
+
+    function capitalizeFirst(str) {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function generateReport() {
+        alert('Report generation feature would be implemented here. This would create a PDF summary of the assessment.');
+    }
+
+    function shareResults() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Healthcare Risk Assessment Results',
+                text: 'I completed my healthcare risk assessment.',
+                url: window.location.href
+            });
+        } else {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Dashboard URL copied to clipboard!');
+            });
+        }
+    }
+</script>
 </body>
 </html>
