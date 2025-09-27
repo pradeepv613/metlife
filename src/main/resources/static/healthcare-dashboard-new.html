@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Healthcare Risk Assessment - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -293,6 +294,25 @@
                 align-items: flex-start;
                 gap: 5px;
             }
+
+            .coin-display {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+
+            .coin-icon {
+                font-size: 1.1em;
+            }
+
+            .reward-message {
+                padding: 15px 20px;
+                font-size: 1em;
+                max-width: 90%;
+                left: 5%;
+                transform: translateY(-50%);
+            }
         }
 
         .loading {
@@ -315,6 +335,144 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Chart container styles */
+        .charts-section {
+            margin: 30px 0;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Health score indicator */
+        .health-score {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-excellent { background: linear-gradient(135deg, #0be881, #00d2d3); }
+        .score-good { background: linear-gradient(135deg, #48dbfb, #0abde3); }
+        .score-fair { background: linear-gradient(135deg, #feca57, #ff9ff3); }
+        .score-poor { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+
+        /* Coin Reward System */
+        .coin-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid #ffcc00;
+        }
+
+        .coin-display:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .coin-icon {
+            font-size: 1.3em;
+            animation: coinSpin 2s infinite linear;
+        }
+
+        .coin-earned {
+            animation: coinEarned 0.5s ease;
+        }
+
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        @keyframes coinEarned {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .reward-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            border: 3px solid #ffcc00;
+        }
+
+        .reward-message.show {
+            display: block;
+            animation: rewardPop 2s ease;
+        }
+
+        @keyframes rewardPop {
+            0% { 
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
         .error-message {
             background: #f8d7da;
             color: #721c24;
@@ -327,9 +485,20 @@
     </style>
 </head>
 <body>
-<div class="container">
+    <!-- Coin Reward Display -->
+    <div class="coin-display" id="coinDisplay">
+        <span class="coin-icon">🪙</span>
+        <span id="coinCount">0</span> Coins
+    </div>
+
+    <!-- Reward Message Popup -->
+    <div class="reward-message" id="rewardMessage">
+        🎉 Congratulations! You earned 10 coins for reaching 40,000+ steps! 🎉
+    </div>
+
+    <div class="container">
     <div class="header">
-        <a href="/api/home" class="back-btn">← Back to Form</a>
+        <a href="/home" class="back-btn">← Back to Form</a>
         <h1>Healthcare Dashboard</h1>
         <p>Your personal health risk assessment results</p>
     </div>
@@ -437,6 +606,29 @@
                         <span class="data-value" id="displayMedications">-</span>
                     </div>
                 </div>
+
+                <!-- Health Score Section -->
+                <div class="health-score">
+                    <h3 style="margin-bottom: 20px; color: #333;">🎯 Overall Health Score</h3>
+                    <div class="score-circle" id="healthScoreCircle">
+                        <span id="healthScoreValue">--</span>
+                    </div>
+                    <p id="healthScoreText">Calculating your health score...</p>
+                </div>
+
+                <!-- Interactive Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">📊 Health Metrics Overview</h3>
+                            <canvas id="healthMetricsChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">💪 Lifestyle Factors</h3>
+                            <canvas id="lifestyleChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="risk-assessment">
@@ -531,6 +723,15 @@
         // Medical History
         document.getElementById('displayIllness').textContent = data.majorIllness || 'None';
         document.getElementById('displayMedications').textContent = data.currentMedications || 'None';
+
+        // Calculate and display health score
+        calculateHealthScore(data);
+        
+        // Create interactive charts
+        createHealthCharts(data);
+        
+        // Calculate and display coin rewards
+        calculateCoinRewards(data);
     }
 
     function fetchRiskAssessment(formData) {
@@ -640,6 +841,307 @@
             });
         }
     }
+
+    // Calculate overall health score
+    function calculateHealthScore(data) {
+        let score = 100;
+        let factors = [];
+
+        // BMI scoring
+        if (data.height && data.weight) {
+            const heightInMeters = data.height / 100;
+            const bmi = data.weight / (heightInMeters * heightInMeters);
+            if (bmi >= 30) {
+                score -= 25;
+                factors.push("High BMI");
+            } else if (bmi >= 25) {
+                score -= 15;
+                factors.push("Overweight");
+            } else if (bmi < 18.5) {
+                score -= 10;
+                factors.push("Underweight");
+            }
+        }
+
+        // Blood pressure scoring
+        if (data.systolicBP >= 140 || data.diastolicBP >= 90) {
+            score -= 20;
+            factors.push("High BP");
+        } else if (data.systolicBP >= 120 || data.diastolicBP >= 80) {
+            score -= 10;
+            factors.push("Elevated BP");
+        }
+
+        // Heart rate scoring
+        if (data.heartRate > 100) {
+            score -= 15;
+            factors.push("High heart rate");
+        } else if (data.heartRate < 60) {
+            score -= 5;
+        }
+
+        // Lifestyle factors
+        if (data.smokingStatus === 'regular') {
+            score -= 25;
+            factors.push("Smoking");
+        } else if (data.smokingStatus === 'sometime') {
+            score -= 15;
+            factors.push("Occasional smoking");
+        }
+
+        if (data.alcoholConsumption === 'regular') {
+            score -= 10;
+            factors.push("Regular alcohol");
+        }
+
+        // Activity and sleep
+        if (data.weeklySteps < 35000) {
+            score -= 15;
+            factors.push("Low activity");
+        }
+
+        const dailySleep = data.weeklySleepHours / 7;
+        if (dailySleep < 6) {
+            score -= 15;
+            factors.push("Insufficient sleep");
+        } else if (dailySleep > 9) {
+            score -= 5;
+        }
+
+        // Ensure score doesn't go below 0
+        score = Math.max(0, score);
+
+        // Update UI
+        const scoreElement = document.getElementById('healthScoreValue');
+        const textElement = document.getElementById('healthScoreText');
+        const circleElement = document.getElementById('healthScoreCircle');
+
+        scoreElement.textContent = score;
+
+        // Set color and message based on score
+        if (score >= 85) {
+            circleElement.className = 'score-circle score-excellent';
+            textElement.textContent = 'Excellent health! Keep up the great work!';
+        } else if (score >= 70) {
+            circleElement.className = 'score-circle score-good';
+            textElement.textContent = 'Good health with room for improvement';
+        } else if (score >= 50) {
+            circleElement.className = 'score-circle score-fair';
+            textElement.textContent = 'Fair health - consider lifestyle changes';
+        } else {
+            circleElement.className = 'score-circle score-poor';
+            textElement.textContent = 'Health concerns detected - consult a healthcare provider';
+        }
+    }
+
+    // Create interactive charts
+    function createHealthCharts(data) {
+        // Health Metrics Radar Chart
+        const ctx1 = document.getElementById('healthMetricsChart').getContext('2d');
+        
+        const healthMetricsChart = new Chart(ctx1, {
+            type: 'radar',
+            data: {
+                labels: ['BMI', 'Blood Pressure', 'Heart Rate', 'Activity Level', 'Sleep Quality'],
+                datasets: [{
+                    label: 'Your Health Metrics',
+                    data: calculateMetricScores(data),
+                    borderColor: 'rgb(33, 150, 243)',
+                    backgroundColor: 'rgba(33, 150, 243, 0.2)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgb(33, 150, 243)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(33, 150, 243)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Lifestyle Factors Doughnut Chart
+        const ctx2 = document.getElementById('lifestyleChart').getContext('2d');
+        
+        const lifestyleChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Smoking Risk', 'Alcohol Risk', 'Activity Level', 'Sleep Quality'],
+                datasets: [{
+                    data: calculateLifestyleScores(data),
+                    backgroundColor: [
+                        data.smokingStatus === 'regular' ? '#ff6b6b' : 
+                        data.smokingStatus === 'sometime' ? '#feca57' : '#0be881',
+                        data.alcoholConsumption === 'regular' ? '#ff6b6b' : 
+                        data.alcoholConsumption === 'sometime' ? '#feca57' : '#0be881',
+                        data.weeklySteps >= 35000 ? '#0be881' : 
+                        data.weeklySteps >= 20000 ? '#feca57' : '#ff6b6b',
+                        (() => {
+                            const dailySleep = data.weeklySleepHours / 7;
+                            return dailySleep >= 6 && dailySleep <= 9 ? '#0be881' : 
+                                   dailySleep >= 5 && dailySleep <= 10 ? '#feca57' : '#ff6b6b';
+                        })()
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    }
+
+    // Calculate metric scores for radar chart
+    function calculateMetricScores(data) {
+        const scores = [];
+        
+        // BMI Score
+        if (data.height && data.weight) {
+            const heightInMeters = data.height / 100;
+            const bmi = data.weight / (heightInMeters * heightInMeters);
+            if (bmi >= 18.5 && bmi < 25) scores.push(100);
+            else if (bmi >= 25 && bmi < 30) scores.push(70);
+            else if (bmi >= 17 && bmi < 35) scores.push(50);
+            else scores.push(25);
+        } else scores.push(0);
+
+        // Blood Pressure Score
+        if (data.systolicBP < 120 && data.diastolicBP < 80) scores.push(100);
+        else if (data.systolicBP < 140 && data.diastolicBP < 90) scores.push(70);
+        else scores.push(30);
+
+        // Heart Rate Score
+        if (data.heartRate >= 60 && data.heartRate <= 100) scores.push(100);
+        else if (data.heartRate >= 50 && data.heartRate <= 110) scores.push(70);
+        else scores.push(40);
+
+        // Activity Score
+        if (data.weeklySteps >= 50000) scores.push(100);
+        else if (data.weeklySteps >= 35000) scores.push(80);
+        else if (data.weeklySteps >= 20000) scores.push(60);
+        else scores.push(30);
+
+        // Sleep Score
+        const dailySleep = data.weeklySleepHours / 7;
+        if (dailySleep >= 7 && dailySleep <= 9) scores.push(100);
+        else if (dailySleep >= 6 && dailySleep <= 10) scores.push(80);
+        else scores.push(50);
+
+        return scores;
+    }
+
+    // Calculate lifestyle scores for doughnut chart
+    function calculateLifestyleScores(data) {
+        return [
+            data.smokingStatus === 'never' ? 25 : 
+            data.smokingStatus === 'sometime' ? 15 : 10,
+            data.alcoholConsumption === 'never' ? 25 : 
+            data.alcoholConsumption === 'sometime' ? 15 : 10,
+            Math.min(25, data.weeklySteps / 2000),
+            Math.min(25, (data.weeklySleepHours / 7) * 3)
+        ];
+    }
+
+    // Calculate and display coin rewards based on step count
+    function calculateCoinRewards(data) {
+        const stepCount = data.weeklySteps || 0;
+        const coinDisplay = document.getElementById('coinDisplay');
+        const coinCount = document.getElementById('coinCount');
+        const rewardMessage = document.getElementById('rewardMessage');
+        
+        // Get existing coins from localStorage (persistent across sessions)
+        let currentCoins = parseInt(localStorage.getItem('healthCoins') || '0');
+        let earnedCoins = 0;
+        
+        // Check if user has already earned coins for this assessment
+        const lastStepCount = parseInt(localStorage.getItem('lastStepCount') || '0');
+        
+        // Award 10 coins if steps >= 40,000 and they haven't earned coins for this step count yet
+        if (stepCount >= 40000) {
+            // Only award coins if this is a new/higher step count to prevent multiple rewards
+            if (stepCount > lastStepCount) {
+                earnedCoins = 10;
+                currentCoins += earnedCoins;
+                
+                // Save to localStorage
+                localStorage.setItem('healthCoins', currentCoins.toString());
+                localStorage.setItem('lastStepCount', stepCount.toString());
+                
+                // Show reward message
+                showRewardMessage();
+                
+                // Add earning animation to coin display
+                coinDisplay.classList.add('coin-earned');
+                setTimeout(() => {
+                    coinDisplay.classList.remove('coin-earned');
+                }, 500);
+            }
+        } else {
+            // Update last step count even if no coins earned
+            localStorage.setItem('lastStepCount', stepCount.toString());
+        }
+        
+        // Update coin display
+        coinCount.textContent = currentCoins;
+        
+        // Add step count info to the coin display on hover
+        coinDisplay.title = `Weekly Steps: ${stepCount.toLocaleString()} ${stepCount >= 40000 ? '- Great job! 🎉' : '- Need 40,000+ for coins'}`;
+        
+        // Change coin display color based on step achievement
+        if (stepCount >= 40000) {
+            coinDisplay.style.background = 'linear-gradient(135deg, #ffd700, #ffed4e)';
+            coinDisplay.style.border = '2px solid #ffcc00';
+        } else {
+            coinDisplay.style.background = 'linear-gradient(135deg, #ccc, #ddd)';
+            coinDisplay.style.border = '2px solid #bbb';
+            coinDisplay.style.color = '#666';
+        }
+    }
+
+    // Show reward message popup
+    function showRewardMessage() {
+        const rewardMessage = document.getElementById('rewardMessage');
+        rewardMessage.classList.add('show');
+        
+        // Hide message after 3 seconds
+        setTimeout(() => {
+            rewardMessage.classList.remove('show');
+        }, 3000);
+    }
+
+    // Add function to reset coins (for testing purposes)
+    function resetCoins() {
+        localStorage.removeItem('healthCoins');
+        localStorage.removeItem('lastStepCount');
+        document.getElementById('coinCount').textContent = '0';
+        const coinDisplay = document.getElementById('coinDisplay');
+        coinDisplay.style.background = 'linear-gradient(135deg, #ccc, #ddd)';
+        coinDisplay.style.border = '2px solid #bbb';
+        coinDisplay.style.color = '#666';
+    }
+
+    // Initialize coins on page load
+    function initializeCoins() {
+        const currentCoins = parseInt(localStorage.getItem('healthCoins') || '0');
+        document.getElementById('coinCount').textContent = currentCoins;
+    }
+
+    // Call initialization when page loads
+    window.addEventListener('load', function() {
+        initializeCoins();
+    });
 </script>
 </body>
 </html>

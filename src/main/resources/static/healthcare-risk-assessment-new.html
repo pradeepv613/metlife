@@ -45,6 +45,27 @@
             opacity: 0.9;
         }
 
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 3px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #fff, #f0f8ff);
+            height: 8px;
+            border-radius: 7px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
         .form-container {
             padding: 40px 30px;
         }
@@ -186,16 +207,104 @@
             margin-bottom: 20px;
             display: none;
         }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8em;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .field-valid {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1) !important;
+        }
+
+        .field-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        /* Dark theme styles */
+        body.dark-theme {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .dark-theme .container {
+            background: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        .dark-theme input, 
+        .dark-theme select, 
+        .dark-theme textarea {
+            background: #34495e;
+            color: #ecf0f1;
+            border-color: #4a5f7a;
+        }
+
+        .dark-theme .info-card {
+            background: #34495e;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>Healthcare Risk Assessment</h1>
-        <p>Complete this form to evaluate your health risk factors and receive personalized recommendations</p>
-    </div>
-
-    <div class="form-container">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        🌙
+    </button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Healthcare Risk Assessment</h1>
+            <p>Complete this form to evaluate your health risk factors and receive personalized recommendations</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-text" id="progressText">0% Complete</div>
+            </div>
+        </div>    <div class="form-container">
         <div class="success-message" id="successMessage">
             Assessment submitted successfully! Thank you for providing your information.
         </div>
@@ -205,21 +314,21 @@
                 <h2 class="section-title">Personal Information</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="name">Full Name <span class="required">*</span></label>
-                        <input type="text" id="name" name="name" required>
+                        <label for="name">Full Name <span >*</span></label>
+                        <input type="text" id="name" name="name" >
                         <div class="error-message">Please enter your full name</div>
                     </div>
 
                     <div class="form-group">
-                        <label for="age">Age <span class="required">*</span></label>
-                        <input type="number" id="age" name="age" min="1" max="120" required>
+                        <label for="age">Age <span >*</span></label>
+                        <input type="number" id="age" name="age" min="1" max="120" >
                         <div class="unit-label">Years</div>
                         <div class="error-message">Please enter a valid age</div>
                     </div>
 
                     <div class="form-group">
-                        <label for="gender">Gender <span class="required">*</span></label>
-                        <select id="gender" name="gender" required>
+                        <label for="gender">Gender <span >*</span></label>
+                        <select id="gender" name="gender" >
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -233,15 +342,23 @@
                 <h2 class="section-title">Physical Measurements</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="height">Height <span class="required">*</span></label>
-                        <input type="number" id="height" name="height" step="0.1" min="50" max="300" required>
+                        <label for="height">Height <span >*</span>
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Enter your height in centimeters. Average adult height ranges from 150-200cm</span>
+                            </span>
+                        </label>
+                        <input type="number" id="height" name="height" step="0.1" min="50" max="300" >
                         <div class="unit-label">Centimeters</div>
                         <div class="error-message">Please enter your height in cm</div>
                     </div>
 
                     <div class="form-group">
-                        <label for="weight">Weight <span class="required">*</span></label>
-                        <input type="number" id="weight" name="weight" step="0.1" min="20" max="500" required>
+                        <label for="weight">Weight <span >*</span>
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Enter your current weight in kilograms</span>
+                            </span>
+                        </label>
+                        <input type="number" id="weight" name="weight" step="0.1" min="20" max="500" >
                         <div class="unit-label">Kilograms</div>
                         <div class="error-message">Please enter your weight in kg</div>
                     </div>
@@ -252,14 +369,14 @@
                 <h2 class="section-title">Vital Signs</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Blood Pressure <span class="required">*</span></label>
+                        <label>Blood Pressure <span >*</span></label>
                         <div class="bp-group">
                             <div>
-                                <input type="number" id="systolicBP" name="systolicBP" placeholder="Systolic" min="70" max="250" required>
+                                <input type="number" id="systolicBP" name="systolicBP" placeholder="Systolic" min="70" max="250" >
                                 <div class="unit-label">mmHg (top number)</div>
                             </div>
                             <div>
-                                <input type="number" id="diastolicBP" name="diastolicBP" placeholder="Diastolic" min="40" max="150" required>
+                                <input type="number" id="diastolicBP" name="diastolicBP" placeholder="Diastolic" min="40" max="150" >
                                 <div class="unit-label">mmHg (bottom number)</div>
                             </div>
                         </div>
@@ -267,8 +384,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="heartRate">Heart Rate <span class="required">*</span></label>
-                        <input type="number" id="heartRate" name="heartRate" min="30" max="200" required>
+                        <label for="heartRate">Heart Rate <span >*</span></label>
+                        <input type="number" id="heartRate" name="heartRate" min="30" max="200" >
                         <div class="unit-label">Beats per minute (BPM)</div>
                         <div class="error-message">Please enter your resting heart rate</div>
                     </div>
@@ -279,8 +396,8 @@
                 <h2 class="section-title">Lifestyle Factors</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="smokingStatus">Smoking Status <span class="required">*</span></label>
-                        <select id="smokingStatus" name="smokingStatus" required>
+                        <label for="smokingStatus">Smoking Status <span >*</span></label>
+                        <select id="smokingStatus" name="smokingStatus" >
                             <option value="">Select Status</option>
                             <option value="never">Never</option>
                             <option value="sometime">Sometimes</option>
@@ -290,8 +407,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="alcoholConsumption">Alcohol Consumption <span class="required">*</span></label>
-                        <select id="alcoholConsumption" name="alcoholConsumption" required>
+                        <label for="alcoholConsumption">Alcohol Consumption <span >*</span></label>
+                        <select id="alcoholConsumption" name="alcoholConsumption" >
                             <option value="">Select Consumption</option>
                             <option value="never">Never</option>
                             <option value="sometime">Sometimes</option>
@@ -301,15 +418,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="weeklySteps">Weekly Steps <span class="required">*</span></label>
-                        <input type="number" id="weeklySteps" name="weeklySteps" min="0" max="1000000" required>
+                        <label for="weeklySteps">Weekly Steps <span >*</span></label>
+                        <input type="number" id="weeklySteps" name="weeklySteps" min="0" max="1000000" >
                         <div class="unit-label">Average steps per week</div>
                         <div class="error-message">Please enter your average weekly steps</div>
                     </div>
 
                     <div class="form-group">
-                        <label for="weeklySleepHours">Weekly Sleep Hours <span class="required">*</span></label>
-                        <input type="number" id="weeklySleepHours" name="weeklySleepHours" min="0" max="168" step="0.5" required>
+                        <label for="weeklySleepHours">Weekly Sleep Hours <span >*</span></label>
+                        <input type="number" id="weeklySleepHours" name="weeklySleepHours" min="0" max="168" step="0.5" >
                         <div class="unit-label">Total hours of sleep per week</div>
                         <div class="error-message">Please enter your total weekly sleep hours</div>
                     </div>
@@ -444,6 +561,162 @@
             this.value = 'None';
         }
     });
+
+    // Progress tracking functionality
+    function updateProgress() {
+        const requiredFields = document.querySelectorAll('input[required], select[required]');
+        let filledFields = 0;
+        
+        requiredFields.forEach(field => {
+            if (field.type === 'number' && field.value && field.value > 0) {
+                filledFields++;
+            } else if (field.type !== 'number' && field.value.trim()) {
+                filledFields++;
+            }
+        });
+        
+        const progress = Math.round((filledFields / requiredFields.length) * 100);
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        
+        progressBar.style.width = progress + '%';
+        progressText.textContent = progress + '% Complete';
+        
+        // Change color based on progress
+        if (progress < 30) {
+            progressBar.style.background = 'linear-gradient(90deg, #ff6b6b, #feca57)';
+        } else if (progress < 70) {
+            progressBar.style.background = 'linear-gradient(90deg, #feca57, #48dbfb)';
+        } else {
+            progressBar.style.background = 'linear-gradient(90deg, #0be881, #00d2d3)';
+        }
+    }
+
+    // Real-time validation and progress updates
+    document.addEventListener('input', function(e) {
+        const field = e.target;
+        
+        // Real-time validation feedback
+        if (field.hasAttribute('required')) {
+            if (field.type === 'number') {
+                if (field.value && field.value >= field.min && field.value <= field.max) {
+                    field.classList.add('field-valid');
+                    field.classList.remove('field-invalid');
+                } else {
+                    field.classList.add('field-invalid');
+                    field.classList.remove('field-valid');
+                }
+            } else {
+                if (field.value.trim()) {
+                    field.classList.add('field-valid');
+                    field.classList.remove('field-invalid');
+                } else {
+                    field.classList.add('field-invalid');
+                    field.classList.remove('field-valid');
+                }
+            }
+            
+            updateProgress();
+        }
+
+        // Auto-save draft functionality
+        saveFormDraft();
+    });
+
+    // Dark mode toggle functionality
+    function toggleTheme() {
+        const body = document.body;
+        const themeToggle = document.querySelector('.theme-toggle');
+        
+        body.classList.toggle('dark-theme');
+        
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.textContent = '☀️';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            themeToggle.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Load saved theme
+    function loadSavedTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const body = document.body;
+        const themeToggle = document.querySelector('.theme-toggle');
+        
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-theme');
+            themeToggle.textContent = '☀️';
+        }
+    }
+
+    // Auto-save form data as draft
+    function saveFormDraft() {
+        const formData = new FormData(document.getElementById('healthAssessmentForm'));
+        const draftData = {};
+        
+        for (let [key, value] of formData.entries()) {
+            draftData[key] = value;
+        }
+        
+        localStorage.setItem('healthFormDraft', JSON.stringify(draftData));
+    }
+
+    // Load saved draft
+    function loadFormDraft() {
+        const draftData = localStorage.getItem('healthFormDraft');
+        
+        if (draftData) {
+            const data = JSON.parse(draftData);
+            
+            Object.keys(data).forEach(key => {
+                const field = document.getElementById(key);
+                if (field && data[key]) {
+                    field.value = data[key];
+                }
+            });
+            
+            updateProgress();
+            
+            // Show notification about loaded draft
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #28a745;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 1001;
+                animation: fadeOut 3s forwards;
+            `;
+            notification.textContent = 'Draft loaded successfully!';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => document.body.removeChild(notification), 3000);
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSavedTheme();
+        loadFormDraft();
+        updateProgress();
+    });
+
+    // Add CSS animation for notification
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
