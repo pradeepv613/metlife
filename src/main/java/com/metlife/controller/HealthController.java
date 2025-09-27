@@ -51,6 +51,8 @@ public class HealthController {
     @PostMapping(value="/generate-insights", produces=MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> generateInsights(@RequestBody HealthForm form) {
 
+        repository.save(form);
+
         String prompt = buildPrompt(form);
 
         String url = azureEndpoint + "/openai/deployments/" + deployment + "/chat/completions?api-version=2025-01-01-preview";
